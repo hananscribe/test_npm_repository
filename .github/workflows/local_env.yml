@@ -1,4 +1,4 @@
-name: dev new - Create signed git clone and image SBOMs
+name: local - Create signed git clone and image SBOMs
 
 on: workflow_dispatch
 
