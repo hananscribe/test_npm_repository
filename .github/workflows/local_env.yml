@@ -61,30 +61,30 @@ jobs:
             docker build -t my-image:latest .
 
 
-#        - name: Generate signed SBOM for docker image
+        - name: Generate signed SBOM for docker image
             # Used after a docker image is built
-#          uses: scribe-security/action-bom@master
-#          with:
+          uses: scribe-security/action-bom@master
+          with:
                 # target: 'docker:${{ github.repository }}:${{ github.sha }}'
-#                type: docker
-#                target: 'my-image:latest'
-#                scribe-enable: true
-#                product-key: "slsa_attest"
-#                scribe-client-id: ${{ secrets.SCRIBE_LOCAL_CLIENT_ID }}
-#                scribe-client-secret: ${{ secrets.SCRIBE_LOCAL_CLIENT_SECRET }}
-#                format: attest
-#                scribe-url: ${{ env.SCRIBE_URL }}
-#                scribe-login-url: ${{ env.SCRIBE_LOGIN_URL }}
-#                scribe-audience: ${{ env.SCRIBE_AUDIENCE }}
+                type: docker
+                target: 'my-image:latest'
+                scribe-enable: true
+                product-key: "slsa_attest"
+                scribe-client-id: ${{ secrets.SCRIBE_LOCAL_CLIENT_ID }}
+                scribe-client-secret: ${{ secrets.SCRIBE_LOCAL_CLIENT_SECRET }}
+                format: attest
+                scribe-url: ${{ env.SCRIBE_URL }}
+                scribe-login-url: ${{ env.SCRIBE_LOGIN_URL }}
+                scribe-audience: ${{ env.SCRIBE_AUDIENCE }}
                 # app-name: $LOGICAL_APP_NAME
                 # app-version: $APP_VERSION
-#                author-name: $AUTHOR_NAME
-#                author-email: $AUTHOR_EMAIL
-#                author-phone: $AUTHOR_PHONE
-#                supplier-name: $SUPPLIER_NAME
-#                supplier-url: $SUPPLIER_URL
-#                supplier-email: $SUPPLIER_EMAIL 
-#                supplier-phone: $SUPPLIER_PHONE
+                author-name: $AUTHOR_NAME
+                author-email: $AUTHOR_EMAIL
+                author-phone: $AUTHOR_PHONE
+                supplier-name: $SUPPLIER_NAME
+                supplier-url: $SUPPLIER_URL
+                supplier-email: $SUPPLIER_EMAIL 
+                supplier-phone: $SUPPLIER_PHONE
 
         - name: Generate SLSA provenance statement
           id: valint_slsa_statement
