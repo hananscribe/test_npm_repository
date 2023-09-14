@@ -15,7 +15,7 @@ env:
         SUPPLIER_EMAIL: info@scribesecurity.com
         SUPPLIER_PHONE: 001-001-0011
         #SCRIBE_URL: "http://localhost:4000"
-        SCRIBE_URL: "https://25a7-2a0d-6fc2-6260-1800-7076-eaf7-5bc6-b0f7.ngrok.io"
+        SCRIBE_URL: "https://fbfe-212-199-146-54.ngrok.io"
         SCRIBE_LOGIN_URL: "https://scribe-hub-dev.us.auth0.com"
         SCRIBE_AUDIENCE: "api.dev.scribesecurity.com"
 
