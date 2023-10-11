@@ -1,0 +1,116 @@
+name: stg_sigstore
+on: 
+  workflow_dispatch:
+  # push:
+
+env:
+        LOGICAL_APP_NAME: demo-project # The app name all these SBOMs will be assosiated with
+        APP_VERSION: 1.0.1 # The app version all these SBOMs will be assosiated with
+        # SBOM Author meta data - Optional
+        AUTHOR_NAME: Alona Dodukh
+        AUTHOR_EMAIL: alonadodukh@tetsemail.com
+        AUTHOR_PHONE: 123-123-123-12345
+        # SBOM Supplier meta data - Optional
+        SUPPLIER_NAME: Scribe-Security 
+        SUPPLIER_URL: www.scribesecurity.com 
+        SUPPLIER_EMAIL: info@scribesecurity.com
+        SUPPLIER_PHONE: 001-001-0011
+        SCRIBE_URL: "https://airflow.staging.scribesecurity.com/"
+        SCRIBE_LOGIN_URL: "https://scribe-hub-staging.us.auth0.com"
+        SCRIBE_AUDIENCE: "api.staging.scribesecurity.com"
+
+jobs:
+
+ build:
+    runs-on: ubuntu-latest
+
+    permissions:
+        contents: read
+        packages: write
+        id-token: write
+
+    steps:
+        - uses: actions/checkout@v3
+
+        - name: Sign Git using Sigstore
+          uses: scribe-security/action-bom@master
+          with:
+                target: 'git:.'
+                scribe-enable: true
+                product-key: "Sigstore"
+                components: packages,files,dep
+                scribe-client-id: ${{ secrets.SCRIBE_STG_NEW_CLIENT_ID }}
+                scribe-client-secret: ${{ secrets.SCRIBE_STG_NEW_CLIENT_SECRET }}
+                format: attest
+                scribe-url: ${{ env.SCRIBE_URL }}
+                scribe-login-url: ${{ env.SCRIBE_LOGIN_URL }}
+                scribe-audience: ${{ env.SCRIBE_AUDIENCE }}
+                product-version: "stg_2_sigstore"
+
+
+        - name: Build the Docker image
+          # run: docker build . -t ${{ github.repository }}:${{ github.sha }}
+          run: |
+            docker build -t my-image:latest .
+        
+
+        - name: Sign Image using Sigstore
+          uses: scribe-security/action-bom@master
+          with:
+                target: my-image:latest
+                scribe-enable: true
+                product-key: "Sigstore"
+                components: packages,files,dep
+                scribe-client-id: ${{ secrets.SCRIBE_STG_NEW_CLIENT_ID }}
+                scribe-client-secret: ${{ secrets.SCRIBE_STG_NEW_CLIENT_SECRET }}
+                format: attest
+                scribe-url: ${{ env.SCRIBE_URL }}
+                scribe-login-url: ${{ env.SCRIBE_LOGIN_URL }}
+                scribe-audience: ${{ env.SCRIBE_AUDIENCE }}
+                product-version: "stg_2_sigstore"
+
+        - name: Verify Image using Sigstore
+          uses: scribe-security/action-verify@master
+          with:
+                target: my-image:latest
+                scribe-enable: true
+                product-key: "Sigstore"
+                components: packages,files,dep
+                scribe-client-id: ${{ secrets.SCRIBE_STG_NEW_CLIENT_ID }}
+                scribe-client-secret: ${{ secrets.SCRIBE_STG_NEW_CLIENT_SECRET }}
+                input-format: attest
+                scribe-url: ${{ env.SCRIBE_URL }}
+                scribe-login-url: ${{ env.SCRIBE_LOGIN_URL }}
+                scribe-audience: ${{ env.SCRIBE_AUDIENCE }}
+                product-version: "stg_2_sigstore"
+                author-name: $AUTHOR_NAME
+                author-email: $AUTHOR_EMAIL
+                author-phone: $AUTHOR_PHONE
+                supplier-name: $SUPPLIER_NAME
+                supplier-url: $SUPPLIER_URL
+                supplier-email: $SUPPLIER_EMAIL 
+                supplier-phone: $SUPPLIER_PHONE
+
+
+        - name: Generate SLSA provenance statement
+          id: valint_slsa_statement
+          uses: scribe-security/action-bom@master
+          with:
+                # target: 'docker:${{ github.repository }}:${{ github.sha }}'
+                type: docker
+                target: my-image:latest
+                format: attest-slsa
+                product-key: "Sigstore"
+                scribe-client-id: ${{ secrets.SCRIBE_STG_NEW_CLIENT_ID }}
+                scribe-client-secret: ${{ secrets.SCRIBE_STG_NEW_CLIENT_SECRET }}
+                scribe-url: ${{ env.SCRIBE_URL }}
+                scribe-login-url: ${{ env.SCRIBE_LOGIN_URL }}
+                scribe-audience: ${{ env.SCRIBE_AUDIENCE }}
+                product-version: "stg_2_sigstore"
+  
+
+        - uses: actions/upload-artifact@v3
+          with:
+                name: provenance
+                path: ${{ steps.valint_slsa_statement.outputs.OUTPUT_PATH }}
+        
