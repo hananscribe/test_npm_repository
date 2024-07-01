@@ -14,7 +14,7 @@ env:
   PRODUCT_NAME: ${{ github.event.inputs.product_name }}
   PRODUCT_VERSION: ${{ github.event.inputs.product_version }}
   SCRIBE_URL: ${{ vars.SCRIBE_URL }}
-  SCRIBE_LOGIN_URL: ${{ vars.SCRIBE_LOGIN_URL }}
+  # SCRIBE_LOGIN_URL: ${{ vars.SCRIBE_LOGIN_URL }}
   SCRIBE_AUDIENCE: ${{ vars.SCRIBE_AUDIENCE }}
 
 on: 
@@ -25,8 +25,8 @@ on:
         description: Environment
         required: true
         options:
-          - stg
-          - prod
+          - dev-demo
+          - dev2_eks
           - dev_eks
           - test_eks
           - stg_eks
@@ -64,52 +64,47 @@ jobs:
         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
          format: attest
          scribe-enable: true
-         product-key: $PRODUCT_NAME
-         product-version: $PRODUCT_VERSION
-         scribe-client-id: ${{ secrets.CLIENT_ID }}
-         scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-         scribe-url: $SCRIBE_URL
-         scribe-login-url: $SCRIBE_LOGIN_URL
-         scribe-audience: $SCRIBE_AUDIENCE
+         product-key: ${{env.PRODUCT_NAME}}
+         product-version: ${{env.PRODUCT_VERSION}}
+         scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+         scribe-url: ${{env.SCRIBE_URL}}
+         scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
          components: packages,files,dep
-         author-name: $AUTHOR_NAME
-         author-email: $AUTHOR_EMAIL
-         author-phone: $AUTHOR_PHONE
-         supplier-name: $SUPPLIER_NAME
-         supplier-url: $SUPPLIER_URL
-         supplier-email: $SUPPLIER_EMAIL 
-         supplier-phone: $SUPPLIER_PHONE
+         author-name: ${{env.AUTHOR_NAME}}
+         author-email: ${{env.AUTHOR_EMAIL}}
+         author-phone: ${{env.AUTHOR_PHONE}}
+         supplier-name: ${{env.SUPPLIER_NAME}}
+         supplier-url: ${{env.SUPPLIER_URL}}
+         supplier-email: ${{env.SUPPLIER_EMAIL}} 
+         supplier-phone: ${{env.SUPPLIER_PHONE}}
          deliverable: true
+         gate: github_action
 
 
       - name: Scm generate dir bom, upload to scribe
         # id: valint_bom_scm
         uses: scribe-security/action-bom@master
         with:
+        # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
           type: dir
           target: ./
           scribe-enable: true
-          product-key: $PRODUCT_NAME
-          product-version: $PRODUCT_VERSION
-          scribe-client-id: ${{ secrets.CLIENT_ID }}
-          scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-          scribe-url: $SCRIBE_URL
-          scribe-login-url: $SCRIBE_LOGIN_URL
-          scribe-audience: $SCRIBE_AUDIENCE
-         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
-          format: attest
-         # app-name: $LOGICAL_APP_NAME
-         # app-version: $APP_VERSION
+          product-key: ${{env.PRODUCT_NAME}}
+          product-version: ${{env.PRODUCT_VERSION}}
+          scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+          scribe-url: ${{env.SCRIBE_URL}}
+          scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
           components: packages,files,dep
-          author-name: $AUTHOR_NAME
-          author-email: $AUTHOR_EMAIL
-          author-phone: $AUTHOR_PHONE
-          supplier-name: $SUPPLIER_NAME
-          supplier-url: $SUPPLIER_URL
-          supplier-email: $SUPPLIER_EMAIL 
-          supplier-phone: $SUPPLIER_PHONE
+          author-name: ${{env.AUTHOR_NAME}}
+          author-email: ${{env.AUTHOR_EMAIL}}
+          author-phone: ${{env.AUTHOR_PHONE}}
+          supplier-name: ${{env.SUPPLIER_NAME}}
+          supplier-url: ${{env.SUPPLIER_URL}}
+          supplier-email: ${{env.SUPPLIER_EMAIL}} 
+          supplier-phone: ${{env.SUPPLIER_PHONE}}
           deliverable: true
-
+          gate: github_action
+      
       - name: Build the Docker image
           # run: docker build . -t ${{ github.repository }}:${{ github.sha }}
         run: |
@@ -123,22 +118,21 @@ jobs:
                 type: docker
                 target: my-image:latest
                 scribe-enable: true
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                format: attest
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
-                # author-name: $AUTHOR_NAME
-                author-email: $AUTHOR_EMAIL
-                author-phone: $AUTHOR_PHONE
-                supplier-name: $SUPPLIER_NAME
-                supplier-url: $SUPPLIER_URL
-                supplier-email: $SUPPLIER_EMAIL 
-                supplier-phone: $SUPPLIER_PHONE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                components: packages,files,dep
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL}} 
+                supplier-phone: ${{env.SUPPLIER_PHONE}}
                 deliverable: true
+                gate: github_action
 
           
       - name: Scm generate registry:busybox:latest bom, upload to scribe
@@ -148,19 +142,21 @@ jobs:
           type: registry
           target: busybox:latest
           scribe-enable: true
-          product-key: $PRODUCT_NAME
-          product-version: $PRODUCT_VERSION
-          scribe-client-id: ${{ secrets.CLIENT_ID }}
-          scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-          scribe-url: $SCRIBE_URL
-          scribe-login-url: $SCRIBE_LOGIN_URL
-          scribe-audience: $SCRIBE_AUDIENCE
-         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
-          format: attest
-         # app-name: $LOGICAL_APP_NAME
-         # app-version: $APP_VERSION
+          product-key: ${{env.PRODUCT_NAME}}
+          product-version: ${{env.PRODUCT_VERSION}}
+          scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+          scribe-url: ${{env.SCRIBE_URL}}
+          scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
           components: packages,files,dep
-          deliverable: false
+          author-name: ${{env.AUTHOR_NAME}}
+          author-email: ${{env.AUTHOR_EMAIL}}
+          author-phone: ${{env.AUTHOR_PHONE}}
+          supplier-name: ${{env.SUPPLIER_NAME}}
+          supplier-url: ${{env.SUPPLIER_URL}}
+          supplier-email: ${{env.SUPPLIER_EMAIL}} 
+          supplier-phone: ${{env.SUPPLIER_PHONE}}
+          deliverable: true
+          gate: github_action
       
       - name: Scm generate file sbom, upload to scribe
         # id: valint_bom_scm
@@ -169,19 +165,20 @@ jobs:
           type: file
           target: "./package.json"
           scribe-enable: true
-          product-key: $PRODUCT_NAME
-          product-version: $PRODUCT_VERSION
-          scribe-client-id: ${{ secrets.CLIENT_ID }}
-          scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-          scribe-url: $SCRIBE_URL
-          scribe-login-url: $SCRIBE_LOGIN_URL
-          scribe-audience: $SCRIBE_AUDIENCE
-         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
-          format: attest
-         # app-name: $LOGICAL_APP_NAME
-         # app-version: $APP_VERSION
-          # components: packages,files,dep
-          deliverable: true
+          product-key: ${{env.PRODUCT_NAME}}
+          product-version: ${{env.PRODUCT_VERSION}}
+          scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+          scribe-url: ${{env.SCRIBE_URL}}
+          scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+          author-name: ${{env.AUTHOR_NAME}}
+          author-email: ${{env.AUTHOR_EMAIL}}
+          author-phone: ${{env.AUTHOR_PHONE}}
+          supplier-name: ${{env.SUPPLIER_NAME}}
+          supplier-url: ${{env.SUPPLIER_URL}}
+          supplier-email: ${{env.SUPPLIER_EMAIL}} 
+          supplier-phone: ${{env.SUPPLIER_PHONE}}
+          deliverable: false
+          gate: github_action
           
       
       - name: Generate SLSA provenance statement
@@ -194,14 +191,20 @@ jobs:
                 # attest-slsa, statement-slsa, attest-generic
                 scribe-enable: true
                 format: attest-slsa
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
-      #           deliverable: true
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL}} 
+                supplier-phone: ${{env.SUPPLIER_PHONE}}
+                # deliverable: true
+                gate: github_action
                 
       - uses: actions/upload-artifact@v3
         with:

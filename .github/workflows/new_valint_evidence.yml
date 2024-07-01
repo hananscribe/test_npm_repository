@@ -8,9 +8,8 @@ on:
         description: Environment
         required: true
         options:
-          - stg
-          - prod
           - dev_eks
+          - dev2_eks
           - ci_eks
           - test_eks
           - stg_eks
@@ -85,7 +84,7 @@ jobs:
         
         - name: Evidence custom tools
           id: valint_evidence_cli_custom
-          uses: scribe-security/action-evidence-cli@dev
+          uses: scribe-security/action-evidence-cli@master
           with:
                 target: 'opshub.json'
                 tool: alona_tool

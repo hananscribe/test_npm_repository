@@ -25,9 +25,9 @@ on:
         description: Environment
         required: true
         options:
-          - stg
-          - prod
+          - dev-demo
           - dev_eks
+          - dev2_eks
           - ci_eks
           - test_eks
           - stg_eks
@@ -63,21 +63,20 @@ jobs:
          target: mongo-express:latest
          format: attest
          scribe-enable: true
-         product-key: $PRODUCT_NAME
-         product-version: $PRODUCT_VERSION
-         scribe-client-id: ${{ secrets.CLIENT_ID }}
-         scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-         scribe-url: $SCRIBE_URL
-         scribe-login-url: $SCRIBE_LOGIN_URL
-         scribe-audience: $SCRIBE_AUDIENCE
+         product-key: ${{env.PRODUCT_NAME}}
+         product-version: ${{env.PRODUCT_VERSION}}
+         scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+         scribe-url: ${{env.SCRIBE_URL}}
+         # scribe-login-url: $SCRIBE_LOGIN_URL
+         scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
          components: packages,files,dep
-         author-name: $AUTHOR_NAME
-         author-email: $AUTHOR_EMAIL
-         author-phone: $AUTHOR_PHONE
-         supplier-name: $SUPPLIER_NAME
-         supplier-url: $SUPPLIER_URL
-         supplier-email: $SUPPLIER_EMAIL 
-         supplier-phone: $SUPPLIER_PHONE
+         author-name: ${{env.AUTHOR_NAME}}
+         author-email: ${{env.AUTHOR_EMAIL}}
+         author-phone: ${{env.AUTHOR_PHONE}}
+         supplier-name: ${{env.SUPPLIER_NAME}}
+         supplier-url: ${{env.SUPPLIER_URL}}
+         supplier-email: ${{env.SUPPLIER_EMAIL}} 
+         supplier-phone: ${{env.SUPPLIER_PHONE}}
 
 
       - name: Generate attest-cyclonedx-json+image
@@ -88,21 +87,22 @@ jobs:
                 target: mongo-express:1.0.0-20-alpine3.17
                 format: attest-cyclonedx-json
                 scribe-enable: true
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
-                # author-name: $AUTHOR_NAME
-                author-email: $AUTHOR_EMAIL
-                author-phone: $AUTHOR_PHONE
-                supplier-name: $SUPPLIER_NAME
-                supplier-url: $SUPPLIER_URL
-                supplier-email: $SUPPLIER_EMAIL 
-                supplier-phone: $SUPPLIER_PHONE 
-                label: $LABEL
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+         # scribe-login-url: $SCRIBE_LOGIN_URL
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                components: packages,files,dep
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL}} 
+                supplier-phone: ${{env.SUPPLIER_PHONE}}
+                label: ${{env.LABEL}}
+                gate: github_action
 
 
       - name: Scm generate statement-cyclonedx-json+mongo
@@ -113,25 +113,22 @@ jobs:
           target: mongo-express:1.0.0-20-alpine3.18
           format: statement-cyclonedx-json
           scribe-enable: true
-          product-key: $PRODUCT_NAME
-          product-version: $PRODUCT_VERSION
-          scribe-client-id: ${{ secrets.CLIENT_ID }}
-          scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-          scribe-url: $SCRIBE_URL
-          scribe-login-url: $SCRIBE_LOGIN_URL
-          scribe-audience: $SCRIBE_AUDIENCE
-         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
-         # app-name: $LOGICAL_APP_NAME
-         # app-version: $APP_VERSION
+          product-key: ${{env.PRODUCT_NAME}}
+          product-version: ${{env.PRODUCT_VERSION}}
+          scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+          scribe-url: ${{env.SCRIBE_URL}}
+          scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
           components: packages,files,dep
-          author-name: $AUTHOR_NAME
-          author-email: $AUTHOR_EMAIL
-          author-phone: $AUTHOR_PHONE
-          supplier-name: $SUPPLIER_NAME
-          supplier-url: $SUPPLIER_URL
-          supplier-email: $SUPPLIER_EMAIL 
-          supplier-phone: $SUPPLIER_PHONE
-          label: $LABEL
+          author-name: ${{env.AUTHOR_NAME}}
+          author-email: ${{env.AUTHOR_EMAIL}}
+          author-phone: ${{env.AUTHOR_PHONE}}
+          supplier-name: ${{env.SUPPLIER_NAME}}
+          supplier-url: ${{env.SUPPLIER_URL}}
+          supplier-email: ${{env.SUPPLIER_EMAIL}} 
+          supplier-phone: ${{env.SUPPLIER_PHONE}}
+         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
+          label: ${{env.LABEL}}
+          gate: github_action
  
           
       - name: Scm generate statement+mongo
@@ -141,25 +138,22 @@ jobs:
           target: mongo-express:1.0.0-20
           format: statement
           scribe-enable: true
-          product-key: $PRODUCT_NAME
-          product-version: $PRODUCT_VERSION
-          scribe-client-id: ${{ secrets.CLIENT_ID }}
-          scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-          scribe-url: $SCRIBE_URL
-          scribe-login-url: $SCRIBE_LOGIN_URL
-          scribe-audience: $SCRIBE_AUDIENCE
-         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
-         # app-name: $LOGICAL_APP_NAME
-         # app-version: $APP_VERSION
+          product-key: ${{env.PRODUCT_NAME}}
+          product-version: ${{env.PRODUCT_VERSION}}
+          scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+          scribe-url: ${{env.SCRIBE_URL}}
+          scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
           components: packages,files,dep
-          author-name: $AUTHOR_NAME
-          author-email: $AUTHOR_EMAIL
-          author-phone: $AUTHOR_PHONE
-          supplier-name: $SUPPLIER_NAME
-          supplier-url: $SUPPLIER_URL
-          supplier-email: $SUPPLIER_EMAIL 
-          supplier-phone: $SUPPLIER_PHONE
-          label: $LABEL
+          author-name: ${{env.AUTHOR_NAME}}
+          author-email: ${{env.AUTHOR_EMAIL}}
+          author-phone: ${{env.AUTHOR_PHONE}}
+          supplier-name: ${{env.SUPPLIER_NAME}}
+          supplier-url: ${{env.SUPPLIER_URL}}
+          supplier-email: ${{env.SUPPLIER_EMAIL}} 
+          supplier-phone: ${{env.SUPPLIER_PHONE}}
+         # format: statement-cyclonedx-json, attest-cyclonedx-json, statement-generic	
+          label: ${{env.LABEL}}
+          gate: github_action
      
       
       - name: Generate SLSA provenance attest
@@ -171,15 +165,14 @@ jobs:
                 # attest-slsa, statement-slsa, attest-generic
                 scribe-enable: true
                 format: attest-slsa
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
                 scribe-client-id: ${{ secrets.CLIENT_ID }}
                 scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
-                deliverable: true
-                label: $LABEL
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                label: ${{env.LABEL}}
+                gate: github_action
         
       - name: Generate SLSA provenance statement 
         id: valint_slsa_statement
@@ -190,15 +183,19 @@ jobs:
                 # attest-slsa, statement-slsa, attest-generic
                 scribe-enable: true
                 format: statement-slsa
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE   
-                deliverable: true
-                label: $LABEL
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                author-name: ${{env.AUTHOR_NAME}}_slsa
+                author-email: ${{env.AUTHOR_EMAIL}}_slsa
+                author-phone: ${{env.AUTHOR_PHONE}}_slsa
+                supplier-name: ${{env.SUPPLIER_NAME}}_slsa
+                supplier-url: ${{env.SUPPLIER_URL}}_slsa
+                supplier-email: ${{env.SUPPLIER_EMAIL}}_slsa
+                supplier-phone: ${{env.SUPPLIER_PHONE}}_slsa
+                gate: github_action
                 
       - uses: actions/upload-artifact@v3
         with:

@@ -7,8 +7,8 @@ on:
         description: Environment
         required: true
         options:
-          - stg
-          - prod
+          - dev-demo
+          - dev2_eks
           - dev_eks
           - ci_eks
           - test_eks
@@ -57,19 +57,24 @@ jobs:
         - uses: actions/checkout@v4
 
         - name: Sign Git using Sigstore
-          uses: scribe-security/action-bom@dev
+          uses: scribe-security/action-bom@master
           with:
                 target: 'git:.'
                 scribe-enable: true
                 components: packages,files,dep
                 format: attest
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL }}
+                supplier-phone: ${{env.SUPPLIER_PHONE}}
 
 
         - name: Build the Docker image
@@ -79,58 +84,59 @@ jobs:
         
 
         - name: Sign Image using Sigstore
-          uses: scribe-security/action-bom@dev
+          uses: scribe-security/action-bom@master
           with:
                 target: my-image:latest
                 scribe-enable: true
                 components: packages,files,dep
                 format: attest
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL }}
+                supplier-phone: ${{env.SUPPLIER_PHONE}}
 
         - name: Verify Image using Sigstore
-          uses: scribe-security/action-verify@dev
+          uses: scribe-security/action-verify@master
           with:
                 target: my-image:latest
                 scribe-enable: true
                 components: packages,files,dep
                 input-format: attest
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
-                author-name: $AUTHOR_NAME
-                author-email: $AUTHOR_EMAIL
-                author-phone: $AUTHOR_PHONE
-                supplier-name: $SUPPLIER_NAME
-                supplier-url: $SUPPLIER_URL
-                supplier-email: $SUPPLIER_EMAIL 
-                supplier-phone: $SUPPLIER_PHONE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL }}
+                supplier-phone: ${{env.SUPPLIER_PHONE}}
 
 
         - name: Generate SLSA provenance statement
           id: valint_slsa_statement
-          uses: scribe-security/action-bom@dev
+          uses: scribe-security/action-bom@master
           with:
                 # target: 'docker:${{ github.repository }}:${{ github.sha }}'
                 type: docker
                 target: my-image:latest
                 format: attest-slsa
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
   
 
         - uses: actions/upload-artifact@v3

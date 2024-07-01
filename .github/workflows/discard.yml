@@ -1,4 +1,4 @@
-name: run_specific_image
+name: discard
 
 on: 
   workflow_dispatch:
@@ -8,7 +8,6 @@ on:
         description: Environment
         required: true
         options:
-          - dev-demo
           - dev2_eks
           - dev_eks
           - ci_eks
@@ -18,15 +17,16 @@ on:
       product_version:
          description: 'Put product version'
          # required: true
-         default: '0.0'
+         default: '0.0.0'
       product_name:
          description: 'Put product name'
          required: true
-         default: 'Run_specific_image'
+         default: 'Discard'
       image_name:
          description: 'Put your image name'
          required: true
          default: 'mongo-express:latest'
+
          
 env:
   PRODUCT_NAME: ${{ github.event.inputs.product_name }}
@@ -61,21 +61,92 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate signed docker SBOM for docker image
-        id: valint_attest_file
+      # - name: Generate not signed docker SBOM for docker image
+      #   id: signed_docker_image
+      #   uses: scribe-security/action-bom@master
+      #   with:
+      #           # statement-cyclonedx-json, attest, 
+      #           type: docker
+      #           target: ${{env.IMAGE_NAME}}
+      #           scribe-enable: true
+      #           format: statement-cyclonedx-json
+      #           product-key: ${{env.PRODUCT_NAME}}
+      #           product-version: ${{env.PRODUCT_VERSION}}_mongo-express:latest
+      #           scribe-client-id: ${{ secrets.CLIENT_ID }}
+      #           scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
+      #           scribe-url: ${{ env.SCRIBE_URL}}
+      #           scribe-audience: ${{env.SCRIBE_AUDIENCE}}
+      #           author-name: ${{env.AUTHOR_NAME}}
+      #           author-email: ${{env.AUTHOR_EMAIL}}
+      #           author-phone: ${{env.AUTHOR_PHONE}}
+      #           supplier-name: ${{env.SUPPLIER_NAME}}
+      #           supplier-url: ${{env.SUPPLIER_URL}}
+      #           supplier-email: ${{env.SUPPLIER_EMAIL}}
+      #           supplier-phone: ${{env.SUPPLIER_PHONE }}
+      #           # deliverable: true
+      #           label: ${{env.LABEL}}
+      #           gate: github_alona
+              
+
+      - name: Generate not signed docker SBOM for docker image
+        id: signed_docker_image_mongo2
         uses: scribe-security/action-bom@master
         with:
                 # statement-cyclonedx-json, attest, 
-                # type: docker
-                target: ${{env.IMAGE_NAME}}
+                type: docker
+                target: mongo-express:1.0-18-alpine3.19
+                # target: $IMAGE_NAME
+                scribe-enable: true
+                format: statement-cyclonedx-json
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}_mongo-express:1.0-18-alpine3.19
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{ env.SCRIBE_URL}}
+                scribe-audience: ${{env.SCRIBE_AUDIENCE}}
+                author-name: ${{env.AUTHOR_NAME}}
+                author-email: ${{env.AUTHOR_EMAIL}}
+                author-phone: ${{env.AUTHOR_PHONE}}
+                supplier-name: ${{env.SUPPLIER_NAME}}
+                supplier-url: ${{env.SUPPLIER_URL}}
+                supplier-email: ${{env.SUPPLIER_EMAIL}}
+                supplier-phone: ${{env.SUPPLIER_PHONE }}
+                label: ${{env.LABEL}}
+                gate: github_alona
+
+
+      - name: Discard evidence  mongo-express:1.0-18-alpine3.19
+        id: valint_discard
+        uses: scribe-security/action-discard@master
+        with:
+           verbose: 2
+           type: docker
+           target: mongo-express:1.0-18-alpine3.19
+           scribe-enable: true
+           product-key: ${{env.PRODUCT_NAME}}
+           product-version: ${{env.PRODUCT_VERSION}}_mongo-express:1.0-18-alpine3.19
+           scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+           scribe-url: ${{ env.SCRIBE_URL}}
+           scribe-audience: ${{env.SCRIBE_AUDIENCE}}
+           silent: true
+  
+           
+      - name: Generate signed docker SBOM for docker image
+        id: signed_docker_image_mysql
+        uses: scribe-security/action-bom@master
+        with:
+                # statement-cyclonedx-json, attest, 
+                type: docker
+                target: mysql:latest
+                # target: $IMAGE_NAME
                 scribe-enable: true
                 format: attest
                 attest-default: x509-env
+                # product-key: $PRODUCT_NAME
                 product-key: ${{env.PRODUCT_NAME}}
-                product-version: ${{env.PRODUCT_VERSION}}
+                product-version: ${{env.PRODUCT_VERSION}}_mysql:latest
                 scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
                 scribe-url: ${{ env.SCRIBE_URL}}
-                scribe-auth-audience : ${{env.SCRIBE_AUDIENCE}}
+                scribe-audience: ${{env.SCRIBE_AUDIENCE}}
                 author-name: ${{env.AUTHOR_NAME}}
                 author-email: ${{env.AUTHOR_EMAIL}}
                 author-phone: ${{env.AUTHOR_PHONE}}
@@ -91,100 +162,66 @@ jobs:
             ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
             ATTEST_CERT: ${{ secrets.ATTEST_CERT}}
             ATTEST_CA:  ${{ secrets.ATTEST_CA }} 
-
-      - name: Generate signed docker SBOM for docker image
-        id: valint_second_attest
-        uses: scribe-security/action-bom@master
-        with:
-                # statement-cyclonedx-json, attest, 
-                # type: docker
-                target: busybox:uclibc
-                scribe-enable: true
-                format: attest
-                attest-default: x509-env
-                product-key: ${{env.PRODUCT_NAME}}
-                product-version: ${{env.PRODUCT_VERSION}}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
-                scribe-url: ${{ env.SCRIBE_URL}}
-                scribe-auth-audience : ${{env.SCRIBE_AUDIENCE}}
-                author-name: ${{env.AUTHOR_NAME}}
-                author-email: ${{env.AUTHOR_EMAIL}}
-                author-phone: ${{env.AUTHOR_PHONE}}
-                supplier-name: ${{env.SUPPLIER_NAME}}
-                supplier-url: ${{env.SUPPLIER_URL}}
-                supplier-email: ${{env.SUPPLIER_EMAIL}}
-                supplier-phone: ${{env.SUPPLIER_PHONE }}
-                # deliverable: true
-                label: ${{env.LABEL}}
-                gate: github_alona
-                
-        env:
-            ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
-            ATTEST_CERT: ${{ secrets.ATTEST_CERT}}
-            ATTEST_CA:  ${{ secrets.ATTEST_CA }}     
-      # - name: Generate valint evidence with aqua
-      #   uses: scribe-security/action-evidence@dev
-      #   with:
-      #           target: './aqua_apline.json'
-      #           scribe-enable: true
-      #           format: attest
-      #           parser: aqua 
-      #           tool: aqua
-      #           tool-version: 0.0.1
-      #           product-key: ${{env.PRODUCT_NAME}}
-      #           product-version: ${{env.PRODUCT_VERSION}}
-      #           scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
-      #           scribe-url: ${{ env.SCRIBE_URL}}
-      #           scribe-auth-audience : ${{env.SCRIBE_AUDIENCE}}
-      #           gate: github_alona     
+       # valint verify busybox:latest -i attest --attest.default=x509 --ca <my_ca.pem>
      
       - name: Verify Image using x509 keys
         uses: scribe-security/action-verify@master
         with:
-               target: ${{env.IMAGE_NAME}}
+               target: mysql:latest
                scribe-enable: true
                components: packages,files,dep
                format: attest
                attest-default: x509-env
                product-key: ${{env.PRODUCT_NAME}}
-               product-version: ${{env.PRODUCT_VERSION}}
+               product-version: ${{env.PRODUCT_VERSION}}_mysql:latest
                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
-               scribe-url: ${{env.SCRIBE_URL}}
-               scribe-auth-audience : ${{env.SCRIBE_AUDIENCE}}
+               scribe-url: ${{ env.SCRIBE_URL}}
+               scribe-audience: ${{env.SCRIBE_AUDIENCE}}
+               author-name: ${{env.AUTHOR_NAME}}
+               author-email: ${{env.AUTHOR_EMAIL}}
+               author-phone: ${{env.AUTHOR_PHONE}}
+               supplier-name: ${{env.SUPPLIER_NAME}}
+               supplier-url: ${{env.SUPPLIER_URL}}
+               supplier-email: ${{env.SUPPLIER_EMAIL}}
+               supplier-phone: ${{env.SUPPLIER_PHONE }}
                # common-name: "Scribe Security CA" - right now we have Githun issue to take only character before space
                email: "alona@scribesecutiry.com"
+               push: true
                verbose: 2
+               DEBUG: true
                label: ${{env.LABEL}}
                gate: github_alona
         env:
             ATTEST_CA: ${{ secrets.ATTEST_CA }}
-            ATTEST_CERT: ${{ secrets.ATTEST_CERT }}    
-     
+            ATTEST_CERT: ${{ secrets.ATTEST_CERT }}     
+
+      
       - name: Generate SLSA provenance statement
         id: valint_slsa_statement
         uses: scribe-security/action-bom@master
         with:
-                type: docker
+                # target: 'docker:${{ github.repository }}:${{ github.sha }}'
+                # type: docker
                 target: ${{env.IMAGE_NAME}}
                 # attest-slsa, statement-slsa, attest-generic
                 scribe-enable: true
-                format: statement-slsa
-                # attest-default: x509-env
+                format: attest-slsa
+                attest-default: x509-env
                 product-key: ${{env.PRODUCT_NAME}}
                 product-version: ${{env.PRODUCT_VERSION}}
                 scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
                 scribe-url: ${{env.SCRIBE_URL}}
-                scribe-auth-audience : ${{env.SCRIBE_AUDIENCE}}
-                gate: github_alona_slsa
-        # env:
-        #     ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
-        #     ATTEST_CERT: ${{ secrets.ATTEST_CERT}}
-        #     ATTEST_CA:  ${{ secrets.ATTEST_CA }}  
+                # scribe-login-url: $SCRIBE_LOGIN_URL
+                scribe-audience: ${{env.SCRIBE_AUDIENCE}}
+                gate: github_alona
+                # deliverable: true
+        env:
+            ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
+            ATTEST_CERT: ${{ secrets.ATTEST_CERT}}
+            ATTEST_CA:  ${{ secrets.ATTEST_CA }}  
                 
       - uses: actions/upload-artifact@v3
         with:
                 name: provenance
                 path: ${{ steps.valint_slsa_statement.outputs.OUTPUT_PATH }}
-          
-                
                 

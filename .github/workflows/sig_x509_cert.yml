@@ -8,8 +8,8 @@ on:
         description: Environment
         required: true
         options:
-          - stg
-          - prod
+          - dev-demo
+          - dev2_eks
           - dev_eks
           - ci_eks
           - test_eks
@@ -58,20 +58,18 @@ jobs:
         - uses: actions/checkout@v4
 
         - name: Sign Git using x509 keys
-          uses: scribe-security/action-bom@dev
+          uses: scribe-security/action-bom@master
           with:
                 target: 'git:.'
                 scribe-enable: true
                 components: packages,files,dep
                 format: attest
                 attest-default: x509-env
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
                 
           env:
             ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
@@ -84,20 +82,18 @@ jobs:
             docker build -t my-image:latest .
         # valint bom busybox:latest -o attest --attest.default=x509 --ca <my_ca.pem> --key <my_key.pem> --cert <my_cert.pem>
         - name: Sign Image using x509 keys
-          uses: scribe-security/action-bom@dev
+          uses: scribe-security/action-bom@master
           with:
                 target: my-image:latest
                 scribe-enable: true
                 components: packages,files,dep
                 format: attest
                 attest-default: x509-env
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE 
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
           env:
             ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
             ATTEST_CERT: ${{ secrets.ATTEST_CERT }}
@@ -118,7 +114,7 @@ jobs:
         #        scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
         #        scribe-url: $SCRIBE_URL
         #        scribe-login-url: $SCRIBE_LOGIN_URL
-        #        scribe-audience: $SCRIBE_AUDIENCE 
+        #        scribe-auth-audience: $SCRIBE_AUDIENCE 
         #        # common-name: "Scribe Security CA" - right now we have Githun issue to take only character before space
         #        email: "alona@scribesecutiry.com"
         #   env:
@@ -127,7 +123,7 @@ jobs:
 
         - name: Generate SLSA provenance statement
           id: valint_slsa_statement
-          uses: scribe-security/action-bom@dev
+          uses: scribe-security/action-bom@master
           with:
                 # target: 'docker:${{ github.repository }}:${{ github.sha }}'
                 type: docker
@@ -135,13 +131,11 @@ jobs:
                 scribe-enable: true
                 format: attest-slsa
                 attest-default: x509-env
-                product-key: $PRODUCT_NAME
-                product-version: $PRODUCT_VERSION
-                scribe-client-id: ${{ secrets.CLIENT_ID }}
-                scribe-client-secret: ${{ secrets.CLIENT_SECRET }}
-                scribe-url: $SCRIBE_URL
-                scribe-login-url: $SCRIBE_LOGIN_URL
-                scribe-audience: $SCRIBE_AUDIENCE
+                product-key: ${{env.PRODUCT_NAME}}
+                product-version: ${{env.PRODUCT_VERSION}}
+                scribe-client-secret: ${{ secrets.CLIENT_SECRET_AUTH}}
+                scribe-url: ${{env.SCRIBE_URL}}
+                scribe-auth-audience: ${{env.SCRIBE_AUDIENCE}}
                 
           env:
             ATTEST_KEY: ${{ secrets.ATTEST_KEY }}
